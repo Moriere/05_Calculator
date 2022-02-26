@@ -150,8 +150,6 @@ function selectOperator (button) {
     }
 }
 
-// EVENT LISTENERS
-
 const operands = {
     num1: null,
     num2: null,
@@ -160,6 +158,8 @@ const operands = {
 let displayBuffer = "";
 let selectedOperator = "";
 let operatorIsSelected = false;
+
+// EVENT LISTENERS
 
 const keypadNumbers = document.querySelectorAll('.number');
 keypadNumbers.forEach(button => button.addEventListener('click', updateScreen));
@@ -172,4 +172,20 @@ equalBtn.addEventListener('click', runOperation);
 const clearBtn = document.getElementById('clear');
 clearBtn.addEventListener('click', clearAll);
 const eraseBtn = document.getElementById('erase');
-eraseBtn.addEventListener('click', eraseScreen)
+eraseBtn.addEventListener('click', eraseScreen);
+
+window.addEventListener('keydown', key => {
+    const keypadNumbersArray = Array.from(keypadNumbers);
+    keypadNumbersArray.sort( (a, b) => (a.id > b.id) ? 1 : -1);
+
+    if (key.key >= 0 && key.key <= 9) keypadNumbersArray[key.key].click();
+    if (key.key === ".") keypadNumbersArray[10].click();
+    if (key.key === "/" || key.key === "*" || key.key === "-" || key.key === "+") {
+        const operator = document.querySelector(`[data-key="${key.key}"]`);
+        operator.click();
+    }
+    if (key.getModifierState("AltGraph") && key.code === "Quote") keypadOperators[0].click();
+    if (key.key === "Backspace") eraseBtn.click();
+    if (key.key === "Enter") equalBtn.click();
+    if (key.key === "Escape") clearBtn.click();
+});
