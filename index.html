@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator</title>
     <script src="./script.js" defer></script>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <div id="calculator">
@@ -16,7 +21,7 @@
         <div id="keypad">
             <div id="row_1">
                 <button id="clear">C</button>
-                <button id="erase">⌫</button>
+                <button id="factorial" data-key="!" class="operator">!</button>
                 <button id="power" class="operator">^</button>
                 <button id="division" data-key="/" class="operator">÷</button>
             </div>
@@ -41,10 +46,20 @@
             <div id="row_5">
                 <button id="0" class="number">0</button>
                 <button id="decimal" class="number">.</button>
+                <button id="erase">⌫</button>
                 <button id="equal">=</button>
             </div>
         </div>
     </div>
-    <footer> Copyright © /insert date/ Moriere <a href="https://github.com/Moriere/05_Calculator"></a></footer>
+    <footer> 
+        <div>
+            Copyright © 
+            <script>document.write(new Date().getFullYear())</script> 
+            Moriere
+        </div>
+        <a href="https://github.com/Moriere/05_Calculator">
+            <i class="fa fa-github" style="font-size:25px; color: white"></i>
+        </a>
+    </footer>
 </body>
 </html>

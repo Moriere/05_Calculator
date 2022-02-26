@@ -17,6 +17,16 @@ function power(num1, num2) {
     return num1 ** num2;
 }
 
+function factorial(num1) {
+    if (num1 === 0) return 1;
+    if (num1 < 0) return "Error";
+
+    for (let i = num1; i > 0; i--) {
+        num1 *= i; 
+    }
+    return num1;
+}
+
 function operate(operator, num1, num2) {
     switch(operator) {
         case "+":
@@ -29,22 +39,28 @@ function operate(operator, num1, num2) {
             return divide(num1, num2);
         case "^":
             return power(num1, num2);
+        case "!":
+            return factorial(num1);
     }
 }
 
 // UI FUNCTIONS
 
-function updateScreen(button) {
-    if (button.target.id === 'decimal') {
-        displayBuffer += ".";
-        button.target.disabled = true;
-    } else {
-        displayBuffer += button.target.id;
+function updateScreen(number) {
+    if (displayBuffer.length < 13) {
+        number.target.classList.add('clicked');
+        if (number.target.id === 'decimal') {
+            displayBuffer += ".";
+            number.target.disabled = true;
+        } else {
+            displayBuffer += number.target.id;
+        }
+        screenBuffer.textContent = displayBuffer;
     }
-    screenBuffer.textContent = displayBuffer;
 }
 
-function eraseScreen() {
+function eraseScreen(event) {
+    event.target.classList.add('clicked');
     if (screenBuffer.textContent === "Error") return;
     displayBuffer = displayBuffer.slice(0, displayBuffer.length - 1);
     screenBuffer.textContent = displayBuffer;
@@ -52,11 +68,11 @@ function eraseScreen() {
 }
 
 function operator (button) {
+    button.target.classList.add('clicked');
     if (!operatorIsSelected && operands.num1 === null) {
         selectOperator(button.target.id);
 
         operands.num1 = Number(displayBuffer);
-        //if (displayBuffer = "") operands.num1 = 0;
         keypadNumbers[10].disabled = false;
         screenOperator.textContent = selectedOperator;
         displayBuffer = "";
@@ -90,7 +106,8 @@ function operator (button) {
     }
 }
 
-function runOperation () {
+function runOperation (event) {
+    event.target.classList.add('clicked');
     operands.num2 = Number(displayBuffer);
     if (operands.num2 !== null) {
         operands.num1 = operate(selectedOperator, operands.num1, operands.num2);
@@ -107,11 +124,13 @@ function runOperation () {
         screenOperator.textContent = "=";
         operatorIsSelected = false;
         displayBuffer = "";
-        screenBuffer.textContent = operands.num1;
+        if (operands.num1 < 10 ** 13) screenBuffer.textContent = operands.num1;
+        else screenBuffer.textContent = "Num is too long"
     } else return;
 }
 
-function clearAll () {
+function clearAll (event) {
+    event.target.classList.add('clicked');
     for (let key in operands) {
         operands[key] = null;
     }
@@ -125,29 +144,28 @@ function clearAll () {
     equalBtn.disabled = false;
 }
 
-function selectOperator (button) {
-    switch (button) {
+function selectOperator (operator) {
+    switch (operator) {
         case "power":
             selectedOperator = "^";
-            operatorIsSelected = true;
             break;
         case "division":
             selectedOperator = "/";
-            operatorIsSelected = true;
             break;
         case "multiplication":
             selectedOperator = "*";
-            operatorIsSelected = true;
             break;
         case "subtraction":
             selectedOperator = "-";
-            operatorIsSelected = true;
             break;
         case "addition":
             selectedOperator = "+";
-            operatorIsSelected = true;
+            break;
+        case "factorial":
+            selectedOperator = "!";
             break;
     }
+    operatorIsSelected = true;
 }
 
 const operands = {
@@ -174,18 +192,31 @@ clearBtn.addEventListener('click', clearAll);
 const eraseBtn = document.getElementById('erase');
 eraseBtn.addEventListener('click', eraseScreen);
 
-window.addEventListener('keydown', key => {
+// KEYBOARD IMPLEMENTATION
+
+function keyboardImplementation(key) {
     const keypadNumbersArray = Array.from(keypadNumbers);
     keypadNumbersArray.sort( (a, b) => (a.id > b.id) ? 1 : -1);
 
     if (key.key >= 0 && key.key <= 9) keypadNumbersArray[key.key].click();
     if (key.key === ".") keypadNumbersArray[10].click();
-    if (key.key === "/" || key.key === "*" || key.key === "-" || key.key === "+") {
+    if (key.key === "/" || key.key === "*" || key.key === "-" || key.key === "+" || key.key === "!") {
         const operator = document.querySelector(`[data-key="${key.key}"]`);
         operator.click();
     }
-    if (key.getModifierState("AltGraph") && key.code === "Quote") keypadOperators[0].click();
+    if (key.getModifierState("AltGraph") && key.code === "Quote") keypadOperators[1].click();
     if (key.key === "Backspace") eraseBtn.click();
     if (key.key === "Enter") equalBtn.click();
     if (key.key === "Escape") clearBtn.click();
-});
+}
+
+window.addEventListener('keydown', keyboardImplementation)
+
+// BUTTON ANIMATION
+
+const buttons = document.querySelectorAll('button');
+buttons.forEach(button => button.addEventListener('transitionend', removeTransition));
+
+function removeTransition(button) {
+    if (button.propertyName === "transform") button.target.classList.remove('clicked')
+}
